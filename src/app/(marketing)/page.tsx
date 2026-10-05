@@ -1,18 +1,26 @@
+import Cta from "../components/marketing/sections/Cta";
+import Examples from "../components/marketing/sections/Examples";
+import Faq from "../components/marketing/sections/Faq";
+import Features from "../components/marketing/sections/Features";
+import Hero from "../components/marketing/sections/Hero";
+import { HowItWorks } from "../components/marketing/sections/HowItWorks";
+import PoweredBy from "../components/marketing/sections/PoweredBy";
+import Stats from "../components/marketing/sections/Stats";
+import UseCases from "../components/marketing/sections/UseCases";
+
+
 export default function HomePage() {
-  return (
-    <section className="relative overflow-hidden">
-      <div className="glow-brand -top-40" />
-      <div className="container-page relative grid min-h-[70dvh] place-items-center py-24 text-center">
-        <div>
-          <span className="badge">Placeholder</span>
-          <h1 className="display text-gradient mt-6">Marketing page coming next</h1>
-          <p className="lead mx-auto mt-5 max-w-xl">Layout, navbar and footer are in place.</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a className="btn btn-primary btn-lg">Primary</a>
-            <a className="btn btn-ghost btn-lg">Ghost</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    return (
+        <>
+            <Hero />
+            <PoweredBy />
+            <Features />
+            <HowItWorks />
+            <Examples />
+            <Stats />
+            <UseCases />
+            <Faq />
+            <Cta />
+        </>
+    );
 }

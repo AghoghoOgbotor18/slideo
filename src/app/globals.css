@@ -157,3 +157,16 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Marketing page extras ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 7s ease-in-out infinite;
+}
+.fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+}
