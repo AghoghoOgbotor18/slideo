@@ -13,10 +13,10 @@ export function AuthShell({
   subtitle,
   children,
 }: {
-  mode: "sign-in" | "sign-up";
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
+    mode: "sign-in" | "sign-up" | "recovery";
+    title: string;
+    subtitle: string;
+    children: React.ReactNode;
 }) {
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden">
@@ -32,16 +32,18 @@ export function AuthShell({
 
       <main className="relative flex flex-1 items-center justify-center px-4 py-10">
         <div className="card w-full max-w-md bg-surface/80 p-6 shadow-[0_30px_80px_-30px_rgba(124,92,255,0.35)] backdrop-blur-xl sm:p-8">
-          <nav aria-label="Account" className="grid grid-cols-2 rounded-full border border-line bg-white/[0.03] p-1">
-            <Link href="/sign-in" aria-current={mode === "sign-in" ? "page" : undefined} className={tab(mode === "sign-in")}>
-              Sign in
-            </Link>
-            <Link href="/sign-up" aria-current={mode === "sign-up" ? "page" : undefined} className={tab(mode === "sign-up")}>
-              Sign up
-            </Link>
-          </nav>
+            {mode !== "recovery" && (
+                <nav aria-label="Account" className="grid grid-cols-2 rounded-full border border-line bg-white/[0.03] p-1">
+                    <Link href="/sign-in" aria-current={mode === "sign-in" ? "page" : undefined} className={tab(mode === "sign-in")}>
+                        Sign in
+                    </Link>
+                    <Link href="/sign-up" aria-current={mode === "sign-up" ? "page" : undefined} className={tab(mode === "sign-up")}>
+                        Sign up
+                    </Link>
+                </nav>
+            )}
 
-          <div className="mt-8 text-center">
+          <div className={mode === "recovery" ? "text-center" : "mt-8 text-center"}>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-[1.75rem]">{title}</h1>
             <p className="mt-2 text-sm text-muted">{subtitle}</p>
           </div>

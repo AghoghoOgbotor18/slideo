@@ -18,6 +18,8 @@ const signUpSchema = z.object({
   password: z.string().min(8).max(72),
 });
 
+const forgotSchema = z.object({ email });
+
 // Supabase error code -> short code shown on the page
 const SIGN_UP_ERRORS: Record<string, string> = {
   user_already_exists: "exists",
@@ -81,4 +83,46 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+//password reset flow
+export async function requestPasswordReset(formData: FormData) {
+  const parsed = forgotSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) redirect("/forgot-password?error=bad_email");
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email);
+
+  if (error) {
+    // Shows in the terminal running `npm run dev`
+    console.error("[requestPasswordReset]", { code: error.code, status: error.status, message: error.message });
+    const limited = error.code === "over_email_send_rate_limit" || error.code === "over_request_rate_limit";
+    redirect(`/forgot-password?error=${limited ? "rate_limit" : "generic"}`);
+  }
+
+  redirect("/forgot-password?info=sent");
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  if (password.length < 8 || password.length > 72) redirect("/reset-password?error=invalid_form");
+  if (password !== confirm) redirect("/reset-password?error=mismatch");
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/forgot-password?error=expired");
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    console.error("[updatePassword]", { code: error.code, status: error.status, message: error.message });
+    const code = error.code === "same_password" ? "same" : error.code === "weak_password" ? "weak" : "generic";
+    redirect(`/reset-password?error=${code}`);
+  }
+
+  redirect("/workspace");
 }
