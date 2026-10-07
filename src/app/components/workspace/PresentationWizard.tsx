@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { createPresentation } from "../../actions/presentations";
 import { BG_PRESETS, FONTS, FONT_SIZES, LIMITS, cssFont, textColorFor, type FontName } from "../../lib/presentation";
 import { SubmitButton } from "../ui/SubmitButton";
+import { GeneratingOverlay } from "./GeneratingOverlay";
 
 const STEPS = [
   { title: "What's it about?", hint: "Describe your topic. The more specific, the better your slides." },
@@ -130,6 +131,7 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
       <p className="mt-1 text-sm text-muted">{STEPS[step].hint}</p>
 
       <form ref={formRef} action={createPresentation} onKeyDown={onKeyDown} className="mt-8">
+        <GeneratingOverlay />
         {/* STEP 1: topic */}
         <div data-step="0" hidden={step !== 0} className="space-y-4">
           <label htmlFor="topic" className="sr-only">
@@ -333,7 +335,7 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
               Next
             </button>
           ) : (
-            <SubmitButton className="btn btn-primary btn-lg" pendingText="Saving…">
+            <SubmitButton className="btn btn-primary btn-lg" pendingText="Generating…">
               Create presentation
             </SubmitButton>
           )}

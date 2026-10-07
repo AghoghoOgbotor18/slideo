@@ -4,10 +4,12 @@ import { NewPresentationWizard } from "../components/workspace/PresentationWizar
 import { PresentationList } from "../components/workspace/PresentationList";
 
 export const metadata = { title: "Workspace" };
+export const maxDuration = 60;
 
 const ERRORS: Record<string, string> = {
   invalid_form: "Please check the form and try again.",
   save_failed: "We couldn't save your presentation. Please try again.",
+  rate_limit: "You've created several presentations in the last hour. Please wait a little before making another.",
 };
 
 export default async function WorkspacePage({

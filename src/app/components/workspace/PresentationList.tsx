@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type Item = {
   id: string;
   topic: string;
@@ -20,9 +22,7 @@ function formatDate(iso: string) {
 export function PresentationList({ items }: { items: Item[] }) {
   if (items.length === 0) {
     return (
-      <div className="card p-8 text-center text-sm text-muted">
-        No presentations yet. Create your first one above.
-      </div>
+      <div className="card p-8 text-center text-sm text-muted">No presentations yet. Create your first one above.</div>
     );
   }
 
@@ -31,14 +31,19 @@ export function PresentationList({ items }: { items: Item[] }) {
       {items.map((item) => {
         const status = STATUS[item.status] ?? STATUS.draft;
         return (
-          <li key={item.id} className="card flex items-center justify-between gap-4 p-4 sm:p-5">
-            <div className="min-w-0">
-              <p className="truncate font-medium">{item.topic}</p>
-              <p className="mt-1 text-xs text-subtle">
-                {item.slide_count} slides · {formatDate(item.created_at)}
-              </p>
-            </div>
-            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${status.className}`}>{status.label}</span>
+          <li key={item.id}>
+            <Link
+              href={`/workspace/${item.id}`}
+              className="card flex items-center justify-between gap-4 p-4 transition hover:border-white/15 sm:p-5"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">{item.topic}</p>
+                <p className="mt-1 text-xs text-subtle">
+                  {item.slide_count} slides · {formatDate(item.created_at)}
+                </p>
+              </div>
+              <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs ${status.className}`}>{status.label}</span>
+            </Link>
           </li>
         );
       })}

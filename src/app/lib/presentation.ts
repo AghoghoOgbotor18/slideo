@@ -26,6 +26,11 @@ export const BG_PRESETS = [
   { name: "White", value: "#ffffff" },
 ];
 
+export const LIMITS = {
+  slides: { min: 5, max: 20 },
+  fontSize: { min: 14, max: 32 },
+};
+
 export const FONT_SIZES = [
   { value: 14, label: "14 pt (very small)" },
   { value: 16, label: "16 pt (small)" },
@@ -35,11 +40,6 @@ export const FONT_SIZES = [
   { value: 28, label: "28 pt (very large)" },
   { value: 32, label: "32 pt (largest)" },
 ];
-
-export const LIMITS = {
-  slides: { min: 5, max: 20 },
-  fontSize: { min: 14, max: 32 },
-};
 
 export const createPresentationSchema = z.object({
   topic: z
