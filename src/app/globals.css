@@ -135,6 +135,17 @@
     background: rgb(255 255 255 / 0.06);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 22%, transparent);
   }
+    /* Dropdowns: the open list is drawn by the browser, so it needs solid colours */
+  select.input,
+  select.input:focus {
+    background-color: var(--color-surface-2);
+    color: var(--color-fg);
+    color-scheme: dark;
+  }
+  select.input option {
+    background-color: var(--color-surface);
+    color: var(--color-fg);
+  }
 }
 
 /* ---------- Ambient effects (used by sections later) ---------- */
