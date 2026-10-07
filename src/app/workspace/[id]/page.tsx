@@ -56,7 +56,7 @@ export default async function PresentationPage({
 
   return (
     <main className="container-page py-8 sm:py-12">
-      <Link href="/workspace" className="flex jusitfy-center items-center gap-1.5 text-sm text-muted transition hover:text-fg mb-8">
+      <Link href="/workspace" className="flex justify-center items-center gap-1.5 text-sm text-muted transition hover:text-fg mb-8">
         <ArrowLeft /> Your presentations
       </Link>
 

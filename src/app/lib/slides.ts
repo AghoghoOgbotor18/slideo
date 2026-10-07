@@ -95,7 +95,7 @@ export function resolveLayout(slide: Slide, style: Style): Resolved {
       title: { x: 0.7, y: 0.5, w: 7.0, h: 1.2 },
       body: { x: 0.7, y: 1.9, w: 7.0, h: 4.9 },
       image: { x: 8.2, y: 0.9, w: 4.43, h: 5.7 },
-      credit: creditBox({ x: 8.2, y: 6.65, w: 4.43, h: 0.3 }),
+      credit: null,
     };
   }
 
@@ -105,7 +105,7 @@ export function resolveLayout(slide: Slide, style: Style): Resolved {
       title: { x: 5.7, y: 0.5, w: 6.93, h: 1.2 },
       body: { x: 5.7, y: 1.9, w: 6.93, h: 4.9 },
       image: { x: 0.7, y: 0.9, w: 4.43, h: 5.7 },
-      credit: creditBox({ x: 0.7, y: 6.65, w: 4.43, h: 0.3 }),
+      credit: null,
     };
   }
 

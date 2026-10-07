@@ -1,7 +1,7 @@
 import type { ImageCredit } from "./slides";
 
 // Unsplash asks for your app name in credit links. Change this once you pick a final name.
-const UTM = "utm_source=deckforge&utm_medium=referral";
+const UTM = "utm_source=slideo&utm_medium=referral";
 
 export type Photo = { id: string; url: string; thumb: string; credit: ImageCredit };
 
