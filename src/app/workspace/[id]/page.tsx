@@ -7,6 +7,8 @@ import { SlideView } from "../../components/SlideView";
 import { SubmitButton } from "../../components/ui/SubmitButton";
 import { GeneratingOverlay } from "../../components/workspace/GeneratingOverlay";
 import { ArrowLeft } from "lucide-react";
+import BackToTop from "@/app/components/BackToTop";
+
 
 export const maxDuration = 60;
 
@@ -60,6 +62,8 @@ export default async function PresentationPage({
         <ArrowLeft /> Your presentations
       </Link>
 
+      <BackToTop />
+
       <h1 className="section-title text-gradient mt-4 max-w-3xl">{slides[0]?.title || presentation.topic}</h1>
       <p className="mt-2 text-sm text-muted">
         {presentation.slide_count} slides · {presentation.font_family} · {presentation.font_size} pt
@@ -107,6 +111,7 @@ export default async function PresentationPage({
               </figure>
             ))}
           </div>
+          
 
           {credits.length > 0 && (
             <p className="mt-10 text-xs text-subtle">
