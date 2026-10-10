@@ -2,14 +2,17 @@
 
 import { useRef, useState } from "react";
 import { createPresentation } from "../../actions/presentations";
-import { BG_PRESETS, FONTS, FONT_SIZES, LIMITS, cssFont, textColorFor, type FontName } from "../../lib/presentation";
+import { BG_PRESETS, FONTS, FONT_SIZES, LIMITS, cssFont, type FontName } from "../../lib/presentation";
+import { THEMES, THEME_KEYS, type ThemeKey } from "../../lib/themes";
+import type { Slide } from "../../lib/slides";
+import { SlideView } from "../SlideView";
 import { SubmitButton } from "../ui/SubmitButton";
 import { GeneratingOverlay } from "./GeneratingOverlay";
 
 const STEPS = [
   { title: "What's it about?", hint: "Describe your topic. The more specific, the better your slides." },
   { title: "A few details", hint: "Who's presenting, and how long should it be?" },
-  { title: "Make it yours", hint: "Pick a font, text size and background colour." },
+  { title: "Make it yours", hint: "Pick a theme, then fine-tune the font, text size and background." },
 ];
 
 const SUGGESTIONS = [
@@ -20,12 +23,26 @@ const SUGGESTIONS = [
 ];
 
 const LAST = STEPS.length - 1;
-const cq = (pt: number) => `${(pt / 960) * 100}cqw`; // pt -> % of slide width (13.33in = 960pt)
 
 const SLIDE_OPTIONS = Array.from(
   { length: LIMITS.slides.max - LIMITS.slides.min + 1 },
   (_, i) => LIMITS.slides.min + i
 );
+
+/** A made-up slide, used for the theme thumbnails and the live preview. */
+const sample = (title: string, bullets: string[]): Slide => ({
+  id: "preview",
+  presentation_id: "preview",
+  position: 1,
+  type: "content",
+  title,
+  bullets,
+  notes: "",
+  layout: "text-only",
+  image_url: null,
+  image_keyword: null,
+  image_credit: null,
+});
 
 function Select({
   id,
@@ -74,6 +91,7 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
 
   const [topic, setTopic] = useState("");
   const [slideCount, setSlideCount] = useState(10);
+  const [theme, setTheme] = useState<ThemeKey>("minimal");
   const [fontFamily, setFontFamily] = useState<FontName>("Calibri");
   const [fontSize, setFontSize] = useState(20);
   const [bg, setBg] = useState(BG_PRESETS[0].value);
@@ -111,8 +129,14 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
     }
   }
 
+  // A theme suggests a background and a font. The person can still change both afterwards.
+  function pickTheme(key: ThemeKey) {
+    setTheme(key);
+    setBg(THEMES[key].bg);
+    setFontFamily(THEMES[key].font);
+  }
+
   const contentSlides = slideCount - 4;
-  const textColor = textColorFor(bg);
 
   return (
     <div>
@@ -132,6 +156,7 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
 
       <form ref={formRef} action={createPresentation} onKeyDown={onKeyDown} className="mt-8">
         <GeneratingOverlay />
+
         {/* STEP 1: topic */}
         <div data-step="0" hidden={step !== 0} className="space-y-4">
           <label htmlFor="topic" className="sr-only">
@@ -210,15 +235,45 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
             <p className="rounded-xl border border-line bg-white/[0.03] px-4 py-3 text-sm text-muted">
               Title, introduction,{" "}
               <span className="text-fg">
-                {contentSlides} content {contentSlides === 1 ? "slide" : "slides"}
+                up to {contentSlides} content {contentSlides === 1 ? "slide" : "slides"}
               </span>
-              , conclusion and a thank-you slide.
+              , conclusion and a thank-you slide. If your topic needs fewer, we&apos;ll make fewer and tell you.
             </p>
           </div>
         </div>
 
-        {/* STEP 3: style */}
+        {/* STEP 3: theme, font, size, background */}
         <div data-step="2" hidden={step !== 2} className="space-y-7">
+          <fieldset>
+            <legend className="mb-2 text-sm text-muted">Theme</legend>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {THEME_KEYS.map((key) => {
+                const t = THEMES[key];
+                return (
+                  <label key={key} className="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="theme"
+                      value={key}
+                      checked={theme === key}
+                      onChange={() => pickTheme(key)}
+                      className="peer sr-only"
+                    />
+                    <div className="rounded-xl border border-line p-1.5 transition peer-checked:border-brand peer-checked:bg-brand/15 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-soft">
+                      <div className="overflow-hidden rounded-lg">
+                        <SlideView
+                          slide={sample(t.label, ["First point", "Second point"])}
+                          style={{ font_family: t.font, font_size: 20, bg_color: t.bg, theme: key }}
+                        />
+                      </div>
+                      <p className="mt-1.5 px-1 text-xs text-muted">{t.label}</p>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+
           <fieldset>
             <legend className="mb-2 text-sm text-muted">Font style</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -288,28 +343,14 @@ export function NewPresentationWizard({ defaultName }: { defaultName: string }) 
             </div>
           </fieldset>
 
-          {/* live preview (same sizing rules the real slides will use) */}
+          {/* live preview: the same renderer the real slides use */}
           <div>
             <p className="mb-2 text-xs text-subtle">Preview</p>
-            <div className="overflow-hidden rounded-xl ring-1 ring-line" style={{ containerType: "inline-size" }}>
-              <div
-                className="flex flex-col justify-center"
-                style={{
-                  aspectRatio: "16 / 9",
-                  background: bg,
-                  color: textColor,
-                  fontFamily: cssFont(fontFamily),
-                  padding: "7cqw",
-                }}
-              >
-                <p className="font-bold leading-tight" style={{ fontSize: cq(Math.round(fontSize * 1.8)) }}>
-                  {topic.trim().slice(0, 50) || "Your slide title"}
-                </p>
-                <ul className="mt-[2cqw] list-disc pl-[3.5cqw]" style={{ fontSize: cq(fontSize), lineHeight: 1.2 }}>
-                  <li>A first key point</li>
-                  <li>A second key point</li>
-                </ul>
-              </div>
+            <div className="overflow-hidden rounded-xl ring-1 ring-line">
+              <SlideView
+                slide={sample(topic.trim().slice(0, 50) || "Your slide title", ["A first key point", "A second key point"])}
+                style={{ font_family: fontFamily, font_size: fontSize, bg_color: bg, theme }}
+              />
             </div>
           </div>
         </div>

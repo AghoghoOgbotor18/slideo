@@ -10,7 +10,6 @@ const box = (b: Box): CSSProperties => ({
   height: `${(b.h / SLIDE_H) * 100}%`,
 });
 
-// points -> % of slide width (13.333in * 72 = 960pt)
 const cq = (pt: number) => `${(pt / (SLIDE_W * 72)) * 100}cqw`;
 
 export function SlideView({ slide, style, eager = false }: { slide: Slide; style: Style; eager?: boolean }) {
@@ -18,6 +17,22 @@ export function SlideView({ slide, style, eager = false }: { slide: Slide; style
   const lines = slide.bullets.filter((b) => b.trim());
   const hero = L.mode === "hero";
   const centered = hero || L.mode === "closing";
+
+  const decos = (front: boolean) =>
+    L.deco
+      .filter((d) => !!d.front === front)
+      .map((d, i) => (
+        <div
+          key={i}
+          aria-hidden="true"
+          style={{
+            ...box(d.box),
+            background: d.color === "text" ? L.textColor : d.color,
+            opacity: d.opacity ?? 1,
+            borderRadius: d.shape === "ellipse" ? "50%" : 0,
+          }}
+        />
+      ));
 
   return (
     <div
@@ -30,6 +45,8 @@ export function SlideView({ slide, style, eager = false }: { slide: Slide; style
         fontFamily: cssFont(style.font_family),
       }}
     >
+      {decos(false)}
+
       {L.image && slide.image_url && (
         <div style={box(L.image)} className="overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -42,6 +59,8 @@ export function SlideView({ slide, style, eager = false }: { slide: Slide; style
         </div>
       )}
       {hero && L.image && <div style={{ ...box(L.image), background: "rgba(0,0,0,0.5)" }} />}
+
+      {decos(true)}
 
       <div
         style={{
@@ -67,19 +86,11 @@ export function SlideView({ slide, style, eager = false }: { slide: Slide; style
             ))}
           </div>
         ) : (
-          <ul
-            style={{
-              ...box(L.body),
-              fontSize: cq(L.bodySize),
-              lineHeight: 1.2,
-              listStyle: "disc",
-              paddingLeft: "1.2em",
-              overflow: "hidden",
-            }}
-          >
+          <ul style={{ ...box(L.body), fontSize: cq(L.bodySize), lineHeight: 1.2, overflow: "hidden" }}>
             {lines.map((line, i) => (
-              <li key={i} style={{ marginBottom: `${10 / L.bodySize}em` }}>
-                {line}
+              <li key={i} style={{ display: "flex", gap: "0.6em", marginBottom: `${10 / L.bodySize}em` }}>
+                <span aria-hidden="true">{L.bullet}</span>
+                <span>{line}</span>
               </li>
             ))}
           </ul>

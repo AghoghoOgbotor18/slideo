@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { THEME_KEYS } from "./themes";
+
 
 // A .pptx file can't embed fonts, so we only offer ones installed on most Windows and Mac computers.
 export const FONTS = [
@@ -51,6 +53,7 @@ export const createPresentationSchema = z.object({
   font_size: z.coerce.number().int().min(LIMITS.fontSize.min).max(LIMITS.fontSize.max),
   bg_color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   slide_count: z.coerce.number().int().min(LIMITS.slides.min).max(LIMITS.slides.max),
+  theme: z.enum(THEME_KEYS).default("minimal"), 
 });
 
 /** Light or dark text, whichever reads better on the given background. */

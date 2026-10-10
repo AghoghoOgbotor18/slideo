@@ -8,6 +8,7 @@ import { SubmitButton } from "../../components/ui/SubmitButton";
 import { GeneratingOverlay } from "../../components/workspace/GeneratingOverlay";
 import { ArrowLeft } from "lucide-react";
 import BackToTop from "@/app/components/BackToTop";
+import type { ThemeKey } from "../../lib/themes";
 
 
 export const maxDuration = 60;
@@ -15,6 +16,8 @@ export const maxDuration = 60;
 const ERRORS: Record<string, string> = {
   ai_busy: "The AI service is busy right now. Wait a minute, then try again.",
   generate_failed: "We couldn't generate your slides this time. Please try again.",
+  rate_limit: "You've made several decks in the last hour. Please wait a little before trying again.",
+
 };
 
 export default async function PresentationPage({
@@ -44,6 +47,7 @@ export default async function PresentationPage({
     font_family: presentation.font_family as string,
     font_size: presentation.font_size as number,
     bg_color: presentation.bg_color as string,
+    theme: (presentation.theme ?? "minimal") as ThemeKey,
   };
 
   const credits = Array.from(
@@ -58,7 +62,7 @@ export default async function PresentationPage({
 
   return (
     <main className="container-page py-8 sm:py-12">
-      <Link href="/workspace" className="flex justify-center items-center gap-1.5 text-sm text-muted transition hover:text-fg mb-8">
+      <Link href="/workspace" className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-fg">
         <ArrowLeft /> Your presentations
       </Link>
 
@@ -72,6 +76,12 @@ export default async function PresentationPage({
       {error && (
         <div role="alert" className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {ERRORS[error] ?? "Something went wrong. Please try again."}
+        </div>
+      )}
+
+      {ready && presentation.notice && (
+        <div role="status" className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          {presentation.notice}
         </div>
       )}
 

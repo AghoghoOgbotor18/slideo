@@ -1,4 +1,5 @@
 import { textColorFor } from "./presentation";
+import { THEMES, type Deco, type ThemeKey } from "./themes";
 
 export type SlideType = "title" | "intro" | "content" | "conclusion" | "thanks";
 export type SlideLayout = "background" | "image-left" | "image-right" | "text-only";
@@ -19,7 +20,7 @@ export type Slide = {
   image_credit: ImageCredit | null;
 };
 
-export type Style = { font_family: string; font_size: number; bg_color: string };
+export type Style = { font_family: string; font_size: number; bg_color: string; theme: ThemeKey };
 
 // 16:9 widescreen, in inches (the same size PowerPoint's "Widescreen" uses)
 export const SLIDE_W = 13.333;
@@ -27,19 +28,7 @@ export const SLIDE_H = 7.5;
 
 export type Box = { x: number; y: number; w: number; h: number };
 
-const RANK: Record<SlideType, number> = { title: 0, intro: 1, content: 2, conclusion: 3, thanks: 4 };
-
-/** Title first, then intro, content, conclusion, thank-you. Position orders slides within a group. */
-export function sortSlides(slides: Slide[]) {
-  return [...slides].sort((a, b) => RANK[a.type] - RANK[b.type] || a.position - b.position);
-}
-
-/** Unsplash images are resized by their CDN through URL parameters. */
-export function imgUrl(raw: string, width: number) {
-  return `${raw}${raw.includes("?") ? "&" : "?"}w=${width}&q=80&fm=jpg&fit=crop&auto=format`;
-}
-
-export type Resolved = {
+export type Base = {
   mode: "hero" | "closing" | "text" | "image-left" | "image-right";
   title: Box;
   body: Box | null;
@@ -51,7 +40,19 @@ export type Resolved = {
   textColor: string;
 };
 
-export function resolveLayout(slide: Slide, style: Style): Resolved {
+export type Resolved = Base & { deco: Deco[]; bullet: string };
+
+/** Slides are ordered by position only, so they can be moved around in the editor later. */
+export function sortSlides(slides: Slide[]) {
+  return [...slides].sort((a, b) => a.position - b.position);
+}
+
+/** Unsplash images are resized by their CDN through URL parameters. */
+export function imgUrl(raw: string, width: number) {
+  return `${raw}${raw.includes("?") ? "&" : "?"}w=${width}&q=80&fm=jpg&fit=crop&auto=format`;
+}
+
+function baseLayout(slide: Slide, style: Style): Base {
   const size = style.font_size;
   const hasImage = !!slide.image_url;
   const base = textColorFor(style.bg_color);
@@ -116,4 +117,11 @@ export function resolveLayout(slide: Slide, style: Style): Resolved {
     image: null,
     credit: null,
   };
+}
+
+/** The layout plus the theme's decorations. SlideView and the PowerPoint export both read this. */
+export function resolveLayout(slide: Slide, style: Style): Resolved {
+  const base = baseLayout(slide, style);
+  const theme = THEMES[style.theme] ?? THEMES.minimal;
+  return { ...base, bullet: theme.bullet, deco: theme.deco(base) };
 }
