@@ -56,14 +56,18 @@ const saveSchema = z.object({
   id: UUID,
   presentation_id: UUID,
   title: z.string().trim().min(1).max(120),
-  bullets: z.string().max(3000),
-  notes: z.string().max(3000),
-  layout: z.enum(["background", "image-left", "image-right", "text-only"]),
+  bullets: z.string().max(3000).default(""), // the thank-you slide has no bullets box
+  notes: z.string().max(3000).default(""), // the title and thank-you slides have no notes box
+  layout: z.enum(["background", "image-left", "image-right", "text-only"]).default("text-only"),
 });
 
 export async function saveSlide(formData: FormData) {
   const parsed = saveSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    // never fail silently: tell the person something went wrong
+    const pid = String(formData.get("presentation_id") ?? "");
+    redirect(UUID.safeParse(pid).success ? `/workspace/${pid}/edit?error=invalid` : "/workspace");
+  }
   const { id, presentation_id, title, bullets, notes } = parsed.data;
 
   const { supabase, user } = await owner(presentation_id);

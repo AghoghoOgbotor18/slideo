@@ -87,11 +87,13 @@ export default async function EditPage({
         downloaded until you choose to.
       </p>
 
-      {error === "upload" && (
+      {(error === "upload" || error === "invalid") && (
         <div role="alert" className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          That image couldn&apos;t be saved. Use a JPG, PNG or WebP under 4 MB.
+            {error === "upload"
+            ? "That image couldn't be saved. Use a JPG, PNG or WebP under 4 MB."
+            : "That slide couldn't be saved. Check the title isn't empty and try again."}
         </div>
-      )}
+    )}
 
       {/* design */}
       <details className="card mt-8 p-4 sm:p-6">
@@ -265,7 +267,7 @@ export default async function EditPage({
                         {s.image_url && (
                           <label className="flex items-center gap-2 text-sm text-muted">
                             <input type="checkbox" name="remove_image" className="size-4 accent-[var(--color-brand)]" />
-                            Remove the current image
+                            Remove the current image to display no image on this slide
                           </label>
                         )}
                       </div>
