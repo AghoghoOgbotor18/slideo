@@ -80,8 +80,13 @@ export default async function PresentationPage({
       )}
 
       {ready && presentation.notice && (
-        <div role="status" className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          {presentation.notice}
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <Link href={`/workspace/${presentation.id}/edit`} className="btn btn-primary">
+            Edit slides
+          </Link>
+          <a href={`/workspace/${presentation.id}/download`} className="btn btn-ghost">
+            Download .pptx
+          </a>
         </div>
       )}
 

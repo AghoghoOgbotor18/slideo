@@ -8,6 +8,7 @@ import { createClient } from "../lib/supabase/server";
 import { createPresentationSchema } from "../lib/presentation";
 import { generateDeck } from "../lib/grok";
 import { searchPhotos, trackDownload, type Photo } from "../lib/unsplash";
+import { BUCKET, storedPath } from "../lib/storage";
 
 type GenerateInput = { topic: string; author_name: string; slide_count: number };
 
@@ -216,6 +217,9 @@ export async function deletePresentation(formData: FormData) {
 
   const { data: own } = await supabase.from("presentations").select("id").eq("id", id).eq("user_id", user.id).single();
   if (own) {
+    const { data: imgs } = await supabase.from("slides").select("image_url").eq("presentation_id", id);
+    const paths = (imgs ?? []).map((r) => storedPath(r.image_url)).filter((p): p is string => !!p);
+    if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
     await supabase.from("slides").delete().eq("presentation_id", id);
     await supabase.from("presentations").delete().eq("id", id).eq("user_id", user.id);
   }
