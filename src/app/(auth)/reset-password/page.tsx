@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { updatePassword } from "../../actions/auth";
 import { AuthShell } from "../../components/auth/AuthShell";
 import { AuthAlert } from "../../components/auth/AuthAlert";
-import { PasswordInput } from "../../components/auth/PasswordInput";
+import { NewPasswordFields } from "../../components/auth/NewPasswordFields";
 import { SubmitButton } from "../../components/ui/SubmitButton";
 import { createClient } from "../../lib/supabase/server";
 
@@ -26,14 +26,7 @@ export default async function ResetPasswordPage({
       <AuthAlert error={error} />
 
       <form action={updatePassword} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-sm text-muted">New password</label>
-          <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} placeholder="At least 8 characters" />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="confirm" className="text-sm text-muted">Confirm new password</label>
-          <PasswordInput id="confirm" name="confirm" autoComplete="new-password" minLength={8} placeholder="Type it again" />
-        </div>
+        <NewPasswordFields />
         <SubmitButton pendingText="Saving…">Save new password</SubmitButton>
       </form>
     </AuthShell>
