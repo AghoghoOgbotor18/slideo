@@ -4,7 +4,7 @@ import { EditorMockup } from "../mockups/EditorMockup";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden pt-14 sm:pt-20 lg:pt-24">
+    <section id="hero" className="relative overflow-hidden pt-14 sm:pt-20 lg:pt-24">
       <div className="glow-brand -top-24" aria-hidden="true" />
       <div className="bg-grid absolute inset-x-0 top-0 h-[40rem]" aria-hidden="true" />
 

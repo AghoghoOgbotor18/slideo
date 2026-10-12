@@ -28,10 +28,10 @@ export default async function WorkspacePage({
   const [{ data: profile }, { data: presentations }] = await Promise.all([
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
     supabase
-      .from("presentations")
-      .select("id, topic, status, slide_count, created_at")
-      .order("created_at", { ascending: false })
-      .limit(20),
+    .from("presentations")
+    .select("id, topic, status, slide_count, created_at, updated_at")
+    .order("created_at", { ascending: false })
+    .limit(20),
   ]);
 
   const fullName = profile?.full_name ?? "";
