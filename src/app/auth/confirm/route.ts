@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
     if (!error) return NextResponse.redirect(`${origin}${next}`);
+    console.error("[confirm] verifyOtp failed:", error.code, error.message);
+  } else {
+    console.error("[confirm] link is missing token_hash or type. Params present:", [...searchParams.keys()]);
   }
 
   return NextResponse.redirect(`${origin}/forgot-password?error=expired`);
