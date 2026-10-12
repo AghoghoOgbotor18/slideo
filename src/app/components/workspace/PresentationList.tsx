@@ -43,6 +43,7 @@ export function PresentationList({ items }: { items: Item[] }) {
         const failed = item.status === "failed" || stuck;
         const ready = item.status === "ready";
         const status = STATUS[failed ? "failed" : item.status] ?? STATUS.draft;
+        const dialogId = `delete-${item.id}`;
 
         return (
           <li key={item.id} className="card p-4 sm:p-5">
@@ -78,23 +79,38 @@ export function PresentationList({ items }: { items: Item[] }) {
                 </form>
               )}
 
-              <details className="relative ml-auto">
-                <summary
-                  className={`${action} cursor-pointer list-none text-red-300 [&::-webkit-details-marker]:hidden`}
-                >
-                  <Trash2 className="size-4" /> Delete
-                </summary>
-                <form
-                  action={deletePresentation}
-                  className="absolute right-0 z-10 mt-2 w-60 rounded-xl border border-line bg-surface-2 p-3 shadow-xl"
-                >
-                  <input type="hidden" name="id" value={item.id} />
-                  <p className="text-xs text-muted">Delete this presentation and its slides for good?</p>
-                  <SubmitButton className="btn btn-ghost mt-2 w-full text-red-300" pendingText="Deleting…">
-                    Yes, delete
-                  </SubmitButton>
-                </form>
-              </details>
+              {/* opens the confirm dialog below */}
+              <button type="button" popoverTarget={dialogId} className={`${action} ml-auto text-red-300`}>
+                <Trash2 className="size-4" /> Delete
+              </button>
+
+              {/* Closes on a click outside it, on Esc, or on Cancel. No JavaScript needed. */}
+              <div
+                id={dialogId}
+                popover="auto"
+                className="card m-auto w-[calc(100%-2rem)] max-w-sm bg-surface p-5 text-fg shadow-[0_30px_80px_-30px_rgba(124,92,255,0.35)] backdrop:bg-bg/70 backdrop:backdrop-blur-sm"
+              >
+                <h3 className="text-base font-semibold tracking-tight">Delete this presentation?</h3>
+                <p className="mt-2 truncate text-sm text-muted">{item.topic}</p>
+                <p className="mt-1 text-sm text-subtle">
+                  Its slides and uploaded images will be deleted for good. This can&apos;t be undone.
+                </p>
+
+                <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button type="button" popoverTarget={dialogId} popoverTargetAction="hide" className="btn btn-ghost">
+                    Cancel
+                  </button>
+                  <form action={deletePresentation}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <SubmitButton
+                      className="btn w-full border border-red-500/30 bg-red-500/15 text-red-200 hover:bg-red-500/25"
+                      pendingText="Deleting…"
+                    >
+                      Yes, delete
+                    </SubmitButton>
+                  </form>
+                </div>
+              </div>
             </div>
           </li>
         );
