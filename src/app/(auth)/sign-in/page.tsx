@@ -24,13 +24,11 @@ export default async function SignInPage({
           <input id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="input" />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm text-muted">Password</label>
-            <Link href="/forgot-password" className="text-sm text-brand-soft hover:underline">
-              Forgot password?
-            </Link>
-          </div>
+          <label htmlFor="password" className="text-sm text-muted">Password</label>
           <PasswordInput id="password" name="password" autoComplete="current-password" placeholder="Your password" />
+          <Link href="/forgot-password" className="text-sm text-brand-soft hover:underline flex items-center justify-end">
+              Forgot password?
+          </Link>
         </div>
         <SubmitButton pendingText="Signing in…">Sign in</SubmitButton>
       </form>
