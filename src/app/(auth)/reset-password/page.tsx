@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { updatePassword } from "../../actions/auth";
 import { AuthShell } from "../../components/auth/AuthShell";
 import { AuthAlert } from "../../components/auth/AuthAlert";
+import { PasswordInput } from "../../components/auth/PasswordInput";
 import { SubmitButton } from "../../components/ui/SubmitButton";
 import { createClient } from "../../lib/supabase/server";
 
@@ -27,11 +28,11 @@ export default async function ResetPasswordPage({
       <form action={updatePassword} className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="password" className="text-sm text-muted">New password</label>
-          <input id="password" name="password" type="password" required minLength={8} maxLength={72} autoComplete="new-password" placeholder="At least 8 characters" className="input" />
+          <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} placeholder="At least 8 characters" />
         </div>
         <div className="space-y-2">
           <label htmlFor="confirm" className="text-sm text-muted">Confirm new password</label>
-          <input id="confirm" name="confirm" type="password" required minLength={8} maxLength={72} autoComplete="new-password" placeholder="Type it again" className="input" />
+          <PasswordInput id="confirm" name="confirm" autoComplete="new-password" minLength={8} placeholder="Type it again" />
         </div>
         <SubmitButton pendingText="Saving…">Save new password</SubmitButton>
       </form>

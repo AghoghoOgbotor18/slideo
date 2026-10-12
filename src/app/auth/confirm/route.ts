@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const nextParam = searchParams.get("next") ?? "";
-  const next = ALLOWED_NEXT.includes(nextParam) ? nextParam : "/workspace";
+  const next =
+    type === "recovery" ? "/reset-password" : ALLOWED_NEXT.includes(nextParam) ? nextParam : "/workspace";
 
   if (tokenHash && type && ALLOWED_TYPES.includes(type)) {
     const supabase = await createClient();

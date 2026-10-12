@@ -91,7 +91,9 @@ export async function requestPasswordReset(formData: FormData) {
   if (!parsed.success) redirect("/forgot-password?error=bad_email");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email);
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${await getOrigin()}/auth/confirm`,
+  });
 
   if (error) {
     // Shows in the terminal running `npm run dev`

@@ -1,7 +1,9 @@
 import { signUp } from "../../actions/auth";
 import { AuthShell } from "../../components/auth/AuthShell";
 import { AuthAlert } from "../../components/auth/AuthAlert";
+import { PasswordInput } from "../../components/auth/PasswordInput";
 import { SubmitButton } from "../../components/ui/SubmitButton";
+
 export const metadata = { title: "Create account" };
 
 export default async function SignUpPage({
@@ -26,7 +28,7 @@ export default async function SignUpPage({
         </div>
         <div className="space-y-2">
           <label htmlFor="password" className="text-sm text-muted">Password</label>
-          <input id="password" name="password" type="password" required minLength={8} maxLength={72} autoComplete="new-password" placeholder="At least 8 characters" className="input" />
+          <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} placeholder="At least 8 characters" />
         </div>
         <SubmitButton pendingText="Creating account…">Create account</SubmitButton>
       </form>
