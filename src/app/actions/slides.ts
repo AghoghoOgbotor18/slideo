@@ -34,12 +34,15 @@ async function owner(presentationId: string) {
 }
 
 /** Keeps slide_count honest and refreshes the pages that show the deck. */
-async function finish(supabase: SupabaseClient, presentationId: string) {
+async function finish(supabase: SupabaseClient, presentationId: string, clearNotice = false) {
   const { count } = await supabase
     .from("slides")
     .select("id", { count: "exact", head: true })
     .eq("presentation_id", presentationId);
-  await supabase.from("presentations").update({ slide_count: count ?? MIN_SLIDES }).eq("id", presentationId);
+  await supabase
+    .from("presentations")
+    .update({ slide_count: count ?? MIN_SLIDES, ...(clearNotice ? { notice: null } : {}) })
+    .eq("id", presentationId);
 
   revalidatePath(`/workspace/${presentationId}`);
   revalidatePath(`/workspace/${presentationId}/edit`);

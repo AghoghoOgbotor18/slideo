@@ -24,20 +24,23 @@ async function loadImage(url: string, box: Box): Promise<string | null> {
   }
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function build(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return new NextResponse("Please sign in.", { status: 401 });
+  if (!user) return NextResponse.redirect(new URL("/sign-in", req.url));
 
   const [{ data: p }, { data: rows }] = await Promise.all([
     supabase.from("presentations").select("*").eq("id", id).eq("user_id", user.id).single(),
     supabase.from("slides").select("*").eq("presentation_id", id),
   ]);
-  if (!p || p.status !== "ready" || !rows?.length) return new NextResponse("Presentation not found.", { status: 404 });
+  if (!p) return NextResponse.redirect(new URL("/workspace", req.url));
+  if (p.status !== "ready" || !rows?.length) {
+    return NextResponse.redirect(new URL(`/workspace/${id}?error=download_failed`, req.url));
+  }
 
   const style: Style = {
     font_family: p.font_family,
@@ -153,11 +156,24 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const file = (await pptx.write({ outputType: "nodebuffer" })) as Buffer;
   const name = (slides[0]?.title || p.topic).replace(/[^\w\- ]+/g, "").trim().slice(0, 60) || "Slideo presentation";
 
+  const filename = `${name}.pptx`;
   return new NextResponse(new Uint8Array(file), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "Content-Disposition": `attachment; filename="${name}.pptx"`,
+      "Content-Disposition": `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+      "Content-Length": String(file.length),
+      "X-Content-Type-Options": "nosniff",
       "Cache-Control": "private, no-store",
     },
   });
+}
+
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    return await build(req, ctx);
+  } catch (e) {
+    console.error("[download]", e instanceof Error ? e.message : e);
+    const { id } = await ctx.params;
+    return NextResponse.redirect(new URL(`/workspace/${id}?error=download_failed`, req.url));
+  }
 }

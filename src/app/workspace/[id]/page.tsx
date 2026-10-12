@@ -17,6 +17,7 @@ const ERRORS: Record<string, string> = {
   ai_busy: "The AI service is busy right now. Wait a minute, then try again.",
   generate_failed: "We couldn't generate your slides this time. Please try again.",
   rate_limit: "You've made several decks in the last hour. Please wait a little before trying again.",
+  download_failed: "We couldn't build the PowerPoint file. Please try again.",
 
 };
 
@@ -81,10 +82,15 @@ export default async function PresentationPage({
 
       {ready && presentation.notice && (
         <div className="mt-6 flex flex-wrap items-center gap-3">
+          {presentation.notice && (
+            <div role="status" className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              {presentation.notice}
+            </div>
+          )}
           <Link href={`/workspace/${presentation.id}/edit`} className="btn btn-primary">
             Edit slides
           </Link>
-          <a href={`/workspace/${presentation.id}/download`} className="btn btn-ghost">
+          <a href={`/workspace/${presentation.id}/download`} download className="btn btn-ghost">
             Download .pptx
           </a>
         </div>

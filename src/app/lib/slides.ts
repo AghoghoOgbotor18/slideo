@@ -64,7 +64,7 @@ function baseLayout(slide: Slide, style: Style): Base {
       title: { x: 1, y: 1.9, w: 11.333, h: 2.2 },
       body: { x: 1, y: 4.3, w: 11.333, h: 1.0 },
       image: hasImage ? { x: 0, y: 0, w: SLIDE_W, h: SLIDE_H } : null,
-      credit: creditBox({ x: 7.8, y: 7.08, w: 5.2, h: 0.3 }),
+      credit: null,
       titleAlign: "center",
       titleSize: Math.min(Math.round(size * 2.6), 60),
       bodySize: Math.round(size * 1.2),
