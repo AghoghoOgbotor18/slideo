@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { cssFont } from "../lib/presentation";
-import { SLIDE_H, SLIDE_W, imgUrl, resolveLayout, type Box, type Slide, type Style } from "../lib/slides";
+import { SLIDE_H, SLIDE_W, bodyLines, imgUrl, resolveLayout, type Box, type Slide, type Style } from "../lib/slides";
 
 const box = (b: Box): CSSProperties => ({
   position: "absolute",
@@ -14,7 +14,7 @@ const cq = (pt: number) => `${(pt / (SLIDE_W * 72)) * 100}cqw`;
 
 export function SlideView({ slide, style, eager = false }: { slide: Slide; style: Style; eager?: boolean }) {
   const L = resolveLayout(slide, style);
-  const lines = slide.bullets.filter((b) => b.trim());
+  const lines = bodyLines(slide);
   const hero = L.mode === "hero";
   const centered = hero || L.mode === "closing";
 

@@ -76,7 +76,7 @@ export default async function EditPage({
         <Link href={`/workspace/${id}`} className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-fg">
           <ArrowLeft className="size-4" /> Back to preview
         </Link>
-        <a href={`/workspace/${id}/download`} download className="btn btn-primary">
+        <a href={`/workspace/${id}/download`} className="btn btn-primary">
           <Download className="size-4" /> Download .pptx
         </a>
       </div>

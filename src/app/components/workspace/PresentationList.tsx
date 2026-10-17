@@ -63,7 +63,7 @@ export function PresentationList({ items }: { items: Item[] }) {
                   <Link href={`/workspace/${item.id}/edit`} className={action}>
                     <Pencil className="size-4" /> Edit
                   </Link>
-                  <a href={`/workspace/${item.id}/download`} download className={action}>
+                  <a href={`/workspace/${item.id}/download`} className={action}>
                     <Download className="size-4" /> Download
                   </a>
                 </>

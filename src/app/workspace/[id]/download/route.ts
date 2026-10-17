@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "../../../lib/supabase/server";
-import { SLIDE_H, SLIDE_W, resolveLayout, sortSlides, type Box, type Slide, type Style } from "../../../lib/slides";
+import { SLIDE_H, SLIDE_W, bodyLines, resolveLayout, sortSlides, type Box, type Slide, type Style } from "../../../lib/slides";
 import type { ThemeKey } from "../../../lib/themes";
 
 export const runtime = "nodejs";
@@ -107,7 +107,7 @@ async function build(req: NextRequest, { params }: { params: Promise<{ id: strin
       lineSpacing: L.titleSize * 1.2,
     });
 
-    const lines = s.bullets.filter((b) => b.trim());
+    const lines = bodyLines(s);
     if (L.body && lines.length > 0) {
       const centered = L.mode === "hero" || L.mode === "closing";
       const code = (L.bullet.codePointAt(0) ?? 0x2022).toString(16).toUpperCase().padStart(4, "0");
@@ -172,7 +172,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   try {
     return await build(req, ctx);
   } catch (e) {
-    console.error("[download]", e instanceof Error ? e.message : e);
+    console.error("[download] failed:", e); // prints the whole error, not only its message
     const { id } = await ctx.params;
     return NextResponse.redirect(new URL(`/workspace/${id}?error=download_failed`, req.url));
   }

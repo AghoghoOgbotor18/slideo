@@ -119,6 +119,13 @@ function baseLayout(slide: Slide, style: Style): Base {
   };
 }
 
+/* Presenter's name and label */
+export function bodyLines(slide: Slide) {
+  const lines = slide.bullets.map((b) => b.trim()).filter(Boolean);
+  if (slide.type !== "title") return lines;
+  return lines.map((l) => (/^presenter\s*:/i.test(l) ? l : `Presenter: ${l}`));
+}
+
 /** The layout plus the theme's decorations. SlideView and the PowerPoint export both read this. */
 export function resolveLayout(slide: Slide, style: Style): Resolved {
   const base = baseLayout(slide, style);
