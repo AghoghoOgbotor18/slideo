@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
   const nextParam = searchParams.get("next") ?? "";
 
-  // This route is only used for password resets, so those always end at the reset page.
+  // This route is only used for password resets, so those always end at the reset page
   const next =
     code || type === "recovery" ? "/reset-password" : ALLOWED_NEXT.includes(nextParam) ? nextParam : "/workspace";
 

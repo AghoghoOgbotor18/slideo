@@ -215,10 +215,25 @@ export default async function EditPage({
                       />
                     </div>
 
+                    {sideLayout && (
+                      <div className="space-y-1.5">
+                        <label htmlFor={`body-${s.id}`} className="text-sm text-muted">Explanation (optional paragraph)</label>
+                        <textarea
+                          id={`body-${s.id}`}
+                          name="body"
+                          rows={4}
+                          maxLength={1500}
+                          defaultValue={s.body}
+                          className="input h-auto resize-y py-3 leading-relaxed"
+                        />
+                        <p className="text-xs text-subtle">Shown above the bullet points. Keep it short so it fits the slide.</p>
+                      </div>
+                    )}
+
                     {s.type !== "thanks" && (
                       <div className="space-y-1.5">
                         <label htmlFor={`bullets-${s.id}`} className="text-sm text-muted">
-                          {s.type === "title" ? "Presenter name" : "Bullet points (one per line, up to 6)"}
+                          {s.type === "title" ? "Presenter name" : "Bullet points (optional, one per line, up to 6)"}
                         </label>
                         <textarea
                           id={`bullets-${s.id}`}

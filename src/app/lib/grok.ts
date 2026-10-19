@@ -2,9 +2,10 @@ import { z } from "zod";
 
 const slideSchema = z.object({
   title: z.string().min(1),
+  body: z.string().nullish().transform((v) => v ?? ""), //an explanation paragraph
   bullets: z.array(z.string()).default([]),
   notes: z.string().nullish().transform((v) => v ?? ""),
-  image_keyword: z.string().nullish(), // the model sometimes leaves this out entirely
+  image_keyword: z.string().nullish(),
 });
 
 const deckSchema = z.object({
@@ -51,9 +52,16 @@ Rules:
 - Each content slide must cover a different aspect of the subject.
 - Arrange the information in a logical order.
 - "title" must be at most 8 words.
-- "bullets" must contain 3 to 5 concise bullet points.
-- Each bullet must be under 18 words.
+- The first slide (the introduction) and the last slide (the conclusion) are explanations,
+  not lists. For these two, "body" holds 2 to 3 complete sentences, at most 55 words,
+  and "bullets" must be an empty array.
+- Content slides in between should vary. Make about half of them bullets only: 
+  "body" is an empty string and "bullets" holds 3 to 5 concise points, each under 18 words.
+  Make the rest combined slides: "body" is one or two sentences, at most 28 words, 
+  that explain the main idea, and "bullets" holds 2 to 3 points, each under 18 words.
 - Bullets must be plain text.
+- Every slide must have text in "body", in "bullets", or in both. Never leave both empty.
+- "body" is plain text: no markdown, no bullet characters.
 - Do not use markdown.
 - Do not include bullet characters inside the bullet strings.
 - "notes" must contain 2 to 3 useful sentences for the presenter.
@@ -139,11 +147,12 @@ export async function generateDeck(topic: string, slideCount: number): Promise<G
       const parsed = deckSchema.parse(extractJson(text));
 
       // drop a slide that came back with no usable bullets instead of failing the whole deck
-      const slides = parsed.slides.filter((s) => s.bullets.some((b) => b.trim()));
+      const slides = parsed.slides.filter((s) => s.body.trim() || s.bullets.some((b) => b.trim()));
       if (slides.length === 0) {
-        lastError = new Error("Groq returned slides with no bullet points.");
+        lastError = new Error("Groq returned slides with no text.");
         continue;
       }
+  
 
       // Too many? Keep the introduction, trim the middle, keep the conclusion.
       // Too few? Accept it. The action tells the user instead of failing.

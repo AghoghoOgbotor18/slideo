@@ -14,7 +14,7 @@ const MIN_SLIDES = 3; // title + one content slide + thank-you
 const UUID = z.string().uuid();
 const isFixed = (type: string) => type === "title" || type === "thanks";
 
-/** Signed-in user who owns this presentation, or they get sent away. */
+/* Signed-in user who owns this presentation, or they get sent away. */
 async function owner(presentationId: string) {
   const supabase = await createClient();
   const {
@@ -33,7 +33,7 @@ async function owner(presentationId: string) {
   return { supabase, user };
 }
 
-/** Keeps slide_count honest and refreshes the pages that show the deck. */
+/* Keeps slide_count honest and refreshes the pages that show the deck. */
 async function finish(supabase: SupabaseClient, presentationId: string, clearNotice = false) {
   const { count } = await supabase
     .from("slides")
@@ -54,11 +54,12 @@ async function removeStored(supabase: SupabaseClient, url: string | null) {
   if (path) await supabase.storage.from(BUCKET).remove([path]);
 }
 
-// ---------- save text, notes, layout and image of one slide ----------
+// save text, notes, layout and image of one slide
 const saveSchema = z.object({
   id: UUID,
   presentation_id: UUID,
   title: z.string().trim().min(1).max(120),
+  body: z.string().max(1500).default(""),
   bullets: z.string().max(3000).default(""), // the thank-you slide has no bullets box
   notes: z.string().max(3000).default(""), // the title and thank-you slides have no notes box
   layout: z.enum(["background", "image-left", "image-right", "text-only"]).default("text-only"),
@@ -67,11 +68,11 @@ const saveSchema = z.object({
 export async function saveSlide(formData: FormData) {
   const parsed = saveSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    // never fail silently: tell the person something went wrong
+    // never fail silently, tell the user something went wrong
     const pid = String(formData.get("presentation_id") ?? "");
     redirect(UUID.safeParse(pid).success ? `/workspace/${pid}/edit?error=invalid` : "/workspace");
   }
-  const { id, presentation_id, title, bullets, notes } = parsed.data;
+  const { id, presentation_id, title, body, bullets, notes } = parsed.data;
 
   const { supabase, user } = await owner(presentation_id);
 
@@ -87,6 +88,7 @@ export async function saveSlide(formData: FormData) {
 
   const update: Record<string, unknown> = {
     title,
+    body: slide.type === "title" || slide.type === "thanks" ? "" : body.trim(),
     notes: slide.type === "title" || slide.type === "thanks" ? "" : notes,
     bullets:
       slide.type === "thanks"
@@ -131,7 +133,7 @@ export async function saveSlide(formData: FormData) {
   await finish(supabase, presentation_id);
 }
 
-// ---------- move a slide up or down ----------
+// move a slide up or down
 export async function moveSlide(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const presentationId = String(formData.get("presentation_id") ?? "");
@@ -156,7 +158,7 @@ export async function moveSlide(formData: FormData) {
   await finish(supabase, presentationId);
 }
 
-// ---------- delete a slide ----------
+// delete a slide
 export async function deleteSlide(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const presentationId = String(formData.get("presentation_id") ?? "");
@@ -177,7 +179,7 @@ export async function deleteSlide(formData: FormData) {
   await finish(supabase, presentationId);
 }
 
-// ---------- add a blank slide after another one ----------
+// add a blank slide after another one
 export async function addSlide(formData: FormData) {
   const after = String(formData.get("after") ?? "");
   const presentationId = String(formData.get("presentation_id") ?? "");
@@ -214,7 +216,7 @@ export async function addSlide(formData: FormData) {
   await finish(supabase, presentationId);
 }
 
-// ---------- change theme, font, size and background ----------
+// change theme, font, size and background
 const styleSchema = z.object({
   presentation_id: UUID,
   theme: z.enum(THEME_KEYS),

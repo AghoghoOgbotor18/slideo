@@ -36,6 +36,7 @@ const sample = (title: string, bullets: string[]): Slide => ({
   position: 1,
   type: "content",
   title,
+  body: "",
   bullets,
   notes: "",
   layout: "text-only",

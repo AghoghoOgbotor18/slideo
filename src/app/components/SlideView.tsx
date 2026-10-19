@@ -15,6 +15,7 @@ const cq = (pt: number) => `${(pt / (SLIDE_W * 72)) * 100}cqw`;
 export function SlideView({ slide, style, eager = false }: { slide: Slide; style: Style; eager?: boolean }) {
   const L = resolveLayout(slide, style);
   const lines = bodyLines(slide);
+  const paragraph = (slide.body ?? "").trim();
   const hero = L.mode === "hero";
   const centered = hero || L.mode === "closing";
 
@@ -86,14 +87,19 @@ export function SlideView({ slide, style, eager = false }: { slide: Slide; style
             ))}
           </div>
         ) : (
-          <ul style={{ ...box(L.body), fontSize: cq(L.bodySize), lineHeight: 1.2, overflow: "hidden" }}>
-            {lines.map((line, i) => (
-              <li key={i} style={{ display: "flex", gap: "0.6em", marginBottom: `${10 / L.bodySize}em` }}>
-                <span aria-hidden="true">{L.bullet}</span>
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
+          <div style={{ ...box(L.body), fontSize: cq(L.bodySize), lineHeight: 1.2, overflow: "hidden" }}>
+            {paragraph && <p style={{ marginBottom: lines.length ? "0.8em" : 0 }}>{paragraph}</p>}
+            {lines.length > 0 && (
+              <ul>
+                {lines.map((line, i) => (
+                  <li key={i} style={{ display: "flex", gap: "0.6em", marginBottom: `${10 / L.bodySize}em` }}>
+                    <span aria-hidden="true">{L.bullet}</span>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         ))}
 
       {L.credit && slide.image_credit && (

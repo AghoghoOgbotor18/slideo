@@ -108,12 +108,23 @@ async function build(req: NextRequest, { params }: { params: Promise<{ id: strin
     });
 
     const lines = bodyLines(s);
-    if (L.body && lines.length > 0) {
+    const paragraph = (s.body ?? "").trim();
+
+    if (L.body && (lines.length > 0 || paragraph)) {
       const centered = L.mode === "hero" || L.mode === "closing";
       const code = (L.bullet.codePointAt(0) ?? 0x2022).toString(16).toUpperCase().padStart(4, "0");
 
-      slide.addText(
-        lines.map((line, n) => ({
+      const runs: { text: string; options: Record<string, unknown> }[] = [];
+
+      if (paragraph && !centered) {
+        runs.push({
+          text: paragraph,
+          options: { breakLine: lines.length > 0, paraSpaceAfter: lines.length ? Math.round(L.bodySize * 0.8) : 0 },
+        });
+      }
+
+      lines.forEach((line, n) =>
+        runs.push({
           text: line,
           options: centered
             ? { breakLine: n < lines.length - 1 }
@@ -122,18 +133,19 @@ async function build(req: NextRequest, { params }: { params: Promise<{ id: strin
                 paraSpaceAfter: 10,
                 breakLine: n < lines.length - 1,
               },
-        })),
-        {
-          ...L.body,
-          fontFace: font,
-          fontSize: L.bodySize,
-          color: hex(L.textColor),
-          align: centered ? "center" : "left",
-          valign: "top",
-          margin: 0,
-          lineSpacing: L.bodySize * 1.2,
-        }
+        })
       );
+
+      slide.addText(runs, {
+        ...L.body,
+        fontFace: font,
+        fontSize: L.bodySize,
+        color: hex(L.textColor),
+        align: centered ? "center" : "left",
+        valign: "top",
+        margin: 0,
+        lineSpacing: L.bodySize * 1.2,
+      });
     }
 
     if (L.credit && s.image_credit) {

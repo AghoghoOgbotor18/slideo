@@ -96,7 +96,7 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   if (error) {
-    // Shows in the terminal running `npm run dev`
+    // Shows in the terminal running "npm run dev" for more info
     console.error("[requestPasswordReset]", { code: error.code, status: error.status, message: error.message });
     const limited = error.code === "over_email_send_rate_limit" || error.code === "over_request_rate_limit";
     redirect(`/forgot-password?error=${limited ? "rate_limit" : "generic"}`);

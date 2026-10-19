@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-/** Crops the photo to the slide's image box and shrinks it, so phone photos stay small. */
+/* Crops the photo to the slide's image box and shrinks it, so phone photos stay small. */
 async function cropToRatio(file: File, ratio: number): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
   const width = ratio >= 1 ? 1600 : 1000;

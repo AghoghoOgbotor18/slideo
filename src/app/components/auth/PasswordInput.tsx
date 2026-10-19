@@ -9,10 +9,10 @@ type Props = {
   autoComplete: "current-password" | "new-password";
   placeholder?: string;
   minLength?: number;
-  /** Pass value and onChange to control the field from the parent. */
+  /* Pass value and onChange to control the field from the parent. */
   value?: string;
   onChange?: (value: string) => void;
-  /** A message here marks the field as invalid and stops the form from submitting. */
+  /* A message here marks the field as invalid and stops the form from submitting. */
   problem?: string;
   describedBy?: string;
 };

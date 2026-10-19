@@ -14,7 +14,7 @@ type GenerateInput = { topic: string; author_name: string; slide_count: number }
 
 const MAX_PER_HOUR = 10;
 
-/** Counts every generation attempt (new or retry) in the last hour. Returns false when the limit is reached. */
+/* Counts every generation attempt (new or retry) in the last hour. Returns false when the limit is reached. */
 async function allowGeneration(supabase: SupabaseClient, userId: string) {
   const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { count } = await supabase
@@ -27,7 +27,7 @@ async function allowGeneration(supabase: SupabaseClient, userId: string) {
   return true;
 }
 
-/** Grok sometimes fails once (bad JSON, a busy moment) and works the second time, so try twice. */
+/* Grok sometimes fails once (bad JSON, a busy moment) and works the second time, so try twice. */
 async function withRetry<T>(fn: () => Promise<T>) {
   try {
     return await fn();
@@ -40,7 +40,7 @@ async function withRetry<T>(fn: () => Promise<T>) {
   }
 }
 
-/** Writes the slides with Grok, finds photos on Unsplash, and saves everything. Throws on failure. */
+/* Writes the slides with Grok, finds photos on Unsplash, and saves everything. Throws on failure. */
 async function runGeneration(supabase: SupabaseClient, presentationId: string, input: GenerateInput) {
   const wanted = Math.max(1, input.slide_count - 2); // everything except the title and thank-you slides
   const deck = await withRetry(() => generateDeck(input.topic, input.slide_count));
@@ -70,6 +70,7 @@ async function runGeneration(supabase: SupabaseClient, presentationId: string, i
       position: 0,
       type: "title",
       title: deck.deck_title,
+      body: "",
       bullets: [input.author_name],
       notes: "",
       layout: "background",
@@ -85,6 +86,7 @@ async function runGeneration(supabase: SupabaseClient, presentationId: string, i
         position: i + 1,
         type: i === 0 ? "intro" : i === n - 1 ? "conclusion" : "content",
         title: s.title.trim(),
+        body: (s.body ?? "").trim().slice(0, 600),
         bullets: s.bullets.map((b) => b.trim()).filter(Boolean).slice(0, 6),
         notes: (s.notes ?? "").trim(),
         layout,
@@ -98,6 +100,7 @@ async function runGeneration(supabase: SupabaseClient, presentationId: string, i
       position: n + 1,
       type: "thanks",
       title: "Thank You",
+      body: "", 
       bullets: [],
       notes: "",
       layout: "text-only",
@@ -111,7 +114,7 @@ async function runGeneration(supabase: SupabaseClient, presentationId: string, i
   const { error } = await supabase.from("slides").insert(rows);
   if (error) throw new Error(`Saving slides failed: ${error.message}`);
 
-  // Fewer slides than asked for? Say so instead of failing.
+  // Give Fewer slides than asked for instead of failing.
   const notice =
     n < wanted
       ? `This topic only had enough to say for ${rows.length} slides, so we made ${rows.length} instead of ${input.slide_count} rather than padding it with filler. For a longer deck, try a broader topic.`
@@ -167,7 +170,7 @@ export async function createPresentation(formData: FormData) {
     await supabase.from("presentations").update({ status: "failed" }).eq("id", presentation.id);
   }
 
-  // The failed presentation is kept, so the person can retry from its page or the list.
+  // The failed presentation is kept, so user can retry from its page or the list.
   redirect(failure ? `/workspace/${presentation.id}?error=${failure}` : `/workspace/${presentation.id}`);
 }
 

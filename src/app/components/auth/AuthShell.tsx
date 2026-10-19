@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "../../components/layout/Logo";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const tab = (active: boolean) =>
   `block rounded-full py-2.5 text-center text-sm font-medium transition ${

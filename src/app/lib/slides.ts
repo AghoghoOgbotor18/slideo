@@ -12,6 +12,7 @@ export type Slide = {
   position: number;
   type: SlideType;
   title: string;
+  body: string;
   bullets: string[];
   notes: string;
   layout: SlideLayout;
@@ -126,9 +127,33 @@ export function bodyLines(slide: Slide) {
   return lines.map((l) => (/^presenter\s*:/i.test(l) ? l : `Presenter: ${l}`));
 }
 
-/** The layout plus the theme's decorations. SlideView and the PowerPoint export both read this. */
+/* Rough check that a paragraph plus bullets fits its box. Shrinks the text a little if it doesn't */
+function fitBodySize(slide: Slide, box: Box, size: number) {
+  const paragraph = (slide.body ?? "").trim();
+  const bullets = slide.bullets.map((b) => b.trim()).filter(Boolean);
+
+  for (let pt = size; pt > 12; pt--) {
+    const perLine = Math.floor((box.w * 72) / (pt * 0.52)); // an average character is a bit over half as wide as the font size
+    const lines = (text: string, indent = 0) => Math.max(1, Math.ceil(text.length / (perLine - indent)));
+
+    let height = 0; // in points
+    if (paragraph) height += lines(paragraph) * pt * 1.2 + (bullets.length ? pt * 0.8 : 0);
+    for (const b of bullets) height += lines(b, 3) * pt * 1.2 + 10;
+
+    if (height <= box.h * 72) return pt;
+  }
+  return 12;
+}
+
+/* The layout plus the theme's decorations. SlideView and the PowerPoint export both read this. */
 export function resolveLayout(slide: Slide, style: Style): Resolved {
-  const base = baseLayout(slide, style);
+  let base = baseLayout(slide, style);
+
+  // Only slides with a paragraph get the fit check, so older decks look exactly as before.
+  if (slide.body?.trim() && base.body && base.mode !== "hero" && base.mode !== "closing") {
+    base = { ...base, bodySize: fitBodySize(slide, base.body, base.bodySize) };
+  }
+
   const theme = THEMES[style.theme] ?? THEMES.minimal;
   return { ...base, bullet: theme.bullet, deco: theme.deco(base) };
 }
